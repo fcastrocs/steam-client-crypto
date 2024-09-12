@@ -5,14 +5,15 @@ steam-web is a Node.js module that implements the Steam client connection encryp
 ## Installation
 
 ```sh
-npm i @machiavelli/steam-client-crypto
+npm i @fcastrocs/steam-client-crypto
 ```
 
 ## Usage
 ```javascript
-import SteamCrypto from "@machiavelli/steam-client-crypto";
+import SteamCrypto from "@fcastrocs/steam-client-crypto";
 
 const hashedStr = SteamCrypto.sha1Hash("plaintext");
+...
 ```
 
 ## Methods
