@@ -28,28 +28,31 @@ export default abstract class SteamCrypto implements ISteamCrypto {
   static encrypt(data: Buffer, key: SessionKey["plain"]): Buffer {
     const IV = this.generateHmacIV(data, key);
 
-    // ECB cipher IV
+    // Using AES-256-ECB for IV encryption
     const cipherIV = Crypto.createCipheriv("aes-256-ecb", key, null);
     cipherIV.setAutoPadding(false);
-    const encryptedIV = Buffer.concat([cipherIV.update(IV), cipherIV.final()]);
+    const encryptedIV = cipherIV.update(IV);
+    cipherIV.final();
 
-    // CBC cipher data
+    // Using AES-256-CBC for data encryption
     const cipherData = Crypto.createCipheriv("aes-256-cbc", key, IV);
     const encryptedData = Buffer.concat([cipherData.update(data), cipherData.final()]);
 
+    // Return concatenated encrypted IV and data directly
     return Buffer.concat([encryptedIV, encryptedData]);
   }
 
   /**
    * Decrypt data received from Steam
    */
-  static decrypt(data: Buffer, key: SessionKey["plain"]) {
-    // decipher IV
+  static decrypt(data: Buffer, key: SessionKey["plain"]): Buffer {
+    // Decipher IV (16 bytes)or online
     const decipherIV = Crypto.createDecipheriv("aes-256-ecb", key, null);
     decipherIV.setAutoPadding(false);
-    const IV = Buffer.concat([decipherIV.update(data.subarray(0, 16)), decipherIV.final()]);
+    const IV = decipherIV.update(data.subarray(0, 16));
+    decipherIV.final();
 
-    // decipher data
+    // Decipher data (rest of the buffer after the IV)
     const decipherData = Crypto.createDecipheriv("aes-256-cbc", key, IV);
     const decryptedData = Buffer.concat([decipherData.update(data.subarray(16)), decipherData.final()]);
 
@@ -73,6 +76,28 @@ export default abstract class SteamCrypto implements ISteamCrypto {
     const hash = Crypto.createHash("sha1");
     hash.update(buffer);
     return hash.digest("hex");
+  }
+
+  static crc32Unsigned(str: string): number {
+    const table = new Uint32Array(256);
+    let crc = ~0;
+
+    // Generate the CRC32 lookup table
+    for (let i = 0; i < 256; i++) {
+      let c = i;
+      for (let j = 0; j < 8; j++) {
+        c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      }
+      table[i] = c;
+    }
+
+    // Calculate CRC32
+    for (let i = 0, len = str.length; i < len; i++) {
+      crc = table[(crc ^ str.charCodeAt(i)) & 0xff] ^ (crc >>> 8);
+    }
+
+    // Finalize the CRC32 value and return as unsigned 32-bit integer
+    return (crc ^ ~0) >>> 0;
   }
 
   /**

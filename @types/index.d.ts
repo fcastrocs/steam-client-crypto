@@ -22,4 +22,6 @@ export default abstract class ISteamCrypto {
    * @returns hashed hex string
    */
   static sha1Hash(input: Buffer | string): string;
+
+  static crc32Unsigned(str: string): number;
 }
