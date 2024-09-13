@@ -1,6 +1,6 @@
 {
   "name": "@fcastrocs/steam-client-crypto",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Steam client connection encryption/decryption protocol.",
   "main": "./lib/index.js",
   "types": "./@types/index.d.ts",
