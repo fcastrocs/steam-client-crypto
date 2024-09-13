@@ -23,5 +23,5 @@ export default abstract class ISteamCrypto {
    */
   static sha1Hash(input: Buffer | string): string;
 
-  static crc32Unsigned(str: string): number;
+  static crc32Unsigned(str: Buffer): number;
 }

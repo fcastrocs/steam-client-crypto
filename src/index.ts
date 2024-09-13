@@ -8,6 +8,13 @@ gdTckPv+T1JzZsuVcNfFjrocejN1oWI0Rrtgt4Bo+hOneoo3S57G9F1fOpn5nsQ6
 6WOiu4gZKODnFMBCiQIBEQ==
 -----END PUBLIC KEY-----`);
 
+const crc32Table = new Uint32Array(256).map((_, i) => {
+  for (let j = 0; j < 8; j++) {
+    i = i & 1 ? 0xedb88320 ^ (i >>> 1) : i >>> 1;
+  }
+  return i >>> 0;
+});
+
 export default abstract class SteamCrypto implements ISteamCrypto {
   /**
    * Generate a 32-byte symmetric sessionkey and encrypt it with Steam's public "System" key.
@@ -78,26 +85,12 @@ export default abstract class SteamCrypto implements ISteamCrypto {
     return hash.digest("hex");
   }
 
-  static crc32Unsigned(str: string): number {
-    const table = new Uint32Array(256);
+  static crc32(buffer: Buffer): number {
     let crc = ~0;
-
-    // Generate the CRC32 lookup table
-    for (let i = 0; i < 256; i++) {
-      let c = i;
-      for (let j = 0; j < 8; j++) {
-        c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-      }
-      table[i] = c;
+    for (let i = 0; i < buffer.length; i++) {
+      crc = crc32Table[(crc ^ buffer[i]) & 0xff] ^ (crc >>> 8);
     }
-
-    // Calculate CRC32
-    for (let i = 0, len = str.length; i < len; i++) {
-      crc = table[(crc ^ str.charCodeAt(i)) & 0xff] ^ (crc >>> 8);
-    }
-
-    // Finalize the CRC32 value and return as unsigned 32-bit integer
-    return (crc ^ ~0) >>> 0;
+    return ~crc >>> 0;
   }
 
   /**
