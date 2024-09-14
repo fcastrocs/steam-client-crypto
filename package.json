@@ -1,6 +1,6 @@
 {
   "name": "@fcastrocs/steam-client-crypto",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Steam client connection encryption/decryption protocol.",
   "main": "./lib/index.js",
   "types": "./@types/index.d.ts",
@@ -15,8 +15,8 @@
   "author": "Francisco Castro",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.4.8",
-    "typescript": "^5.1.6"
+    "@types/node": "^22.5.5",
+    "typescript": "^5.6.2"
   },
   "keywords": [
     "steam",

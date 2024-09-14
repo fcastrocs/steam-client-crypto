@@ -1,5 +1,5 @@
 import Crypto from "crypto";
-import ISteamCrypto, { SessionKey } from "../@types";
+import { SessionKey } from "../@types";
 
 const SteamPublicKey = Buffer.from(`-----BEGIN PUBLIC KEY-----
 MIGdMA0GCSqGSIb3DQEBAQUAA4GLADCBhwKBgQDf7BrWLBBmLBc1OhSwfFkRf53T
@@ -15,7 +15,7 @@ const crc32Table = new Uint32Array(256).map((_, i) => {
   return i >>> 0;
 });
 
-export default abstract class SteamCrypto implements ISteamCrypto {
+export default abstract class SteamCrypto {
   /**
    * Generate a 32-byte symmetric sessionkey and encrypt it with Steam's public "System" key.
    * @param nonce - obtained in channelEncryptResponse when encrypting connection to Steam
@@ -64,25 +64,6 @@ export default abstract class SteamCrypto implements ISteamCrypto {
     const decryptedData = Buffer.concat([decipherData.update(data.subarray(16)), decipherData.final()]);
 
     return decryptedData;
-  }
-
-  /**
-   * Hash a string or buffer with sha1
-   * @returns hashed hex string
-   */
-  static sha1Hash(input: Buffer | string): string {
-    let buffer;
-
-    // convert to buffer
-    if (!Buffer.isBuffer(input)) {
-      buffer = Buffer.from(input, "utf8");
-    } else {
-      buffer = input;
-    }
-
-    const hash = Crypto.createHash("sha1");
-    hash.update(buffer);
-    return hash.digest("hex");
   }
 
   static crc32(buffer: Buffer): number {
