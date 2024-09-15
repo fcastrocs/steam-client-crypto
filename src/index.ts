@@ -1,5 +1,6 @@
-import Crypto from "crypto";
+import Crypto, { createPublicKey, publicEncrypt } from "crypto";
 import { SessionKey } from "../@types";
+import { RSA_PKCS1_PADDING } from "constants";
 
 const SteamPublicKey = Buffer.from(`-----BEGIN PUBLIC KEY-----
 MIGdMA0GCSqGSIb3DQEBAQUAA4GLADCBhwKBgQDf7BrWLBBmLBc1OhSwfFkRf53T
@@ -72,6 +73,30 @@ export default abstract class SteamCrypto {
       crc = crc32Table[(crc ^ buffer[i]) & 0xff] ^ (crc >>> 8);
     }
     return ~crc >>> 0;
+  }
+
+  /**
+   * Encrypt password with RSA
+   */
+  static rsaEncrypt(password: string, publicKeyMod: string, publicKeyExp: string): string {
+    // Create the public key from the modulus and exponent
+    const publicKey = createPublicKey({
+      key: {
+        kty: "RSA",
+        n: Buffer.from(publicKeyMod, "hex").toString("base64"),
+        e: Buffer.from(publicKeyExp, "hex").toString("base64"),
+      },
+      format: "jwk",
+    });
+
+    // Encrypt the password using the public key
+    return publicEncrypt(
+      {
+        key: publicKey,
+        padding: RSA_PKCS1_PADDING,
+      },
+      Buffer.from(password)
+    ).toString("base64");
   }
 
   /**

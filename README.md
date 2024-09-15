@@ -1,6 +1,6 @@
 # steam-client-crypto
 
-A Node.js module that implements the Steam client TCP connection crypto for encryption handshake, as well as payload encryption/decryption. It is used here https://github.com/fcastrocs/steam-client/blob/main/src/connections/SteamTcp.ts
+A Node.js module that implements crypto used in the Steam client. Mainly TCP connection encryption handshake, and payload encryption/decryption. Also, password RSA encryption. It is used here https://github.com/fcastrocs/steam-client
 
 ## Installation
 
@@ -46,5 +46,10 @@ export default abstract class SteamCrypto {
    * Compute a crc32 as an unsigned number
    */
   static crc32(str: Buffer): number;
+
+  /**
+   * Encrypt password with RSA
+   */
+  static rsaEncrypt(password: string, publicKeyMod: string, publicKeyExp: string): string;
 }
 ```

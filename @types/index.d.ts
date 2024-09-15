@@ -22,4 +22,9 @@ export default abstract class SteamCrypto {
    * Compute a crc32 as an unsigned number
    */
   static crc32(str: Buffer): number;
+
+  /**
+   * Encrypt password with RSA
+   */
+  static rsaEncrypt(password: string, publicKeyMod: string, publicKeyExp: string): string;
 }
